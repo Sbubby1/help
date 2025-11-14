@@ -11,9 +11,7 @@ let color3 = toolbox.getRandomColor();
 let color4 = toolbox.getRandomColor();
 let color5 = toolbox.getRandomColor();
 let color6 = toolbox.getRandomColor();
-let color7 = toolbox.getRandomColor();
-let color8 = toolbox.getRandomColor();
-let color9 = toolbox.getRandomColor();
+
 let card1a = new MemoryButton(canvas, pencil, 30, 50, color1);
 let card1b = new MemoryButton(canvas, pencil, 180, 50, color1);
 let card2a = new MemoryButton(canvas, pencil, 330, 50, color2 );
@@ -26,6 +24,60 @@ let card5a = new MemoryButton(canvas, pencil, 30, 400, color5);
 let card5b = new MemoryButton(canvas, pencil, 180, 400, color5);
 let card6a = new MemoryButton(canvas, pencil, 330, 400, color6);
 let card6b = new MemoryButton(canvas, pencil, 470, 400, color6);
+
+
+let cards = [
+  card1a,card1b, card2a, card2b,
+  card3a, card3b, card4a, card4b,
+  card5a, card5b, card6a, card6b
+];
+
+
+for (let i = cards.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+}
+
+let positions = [
+  {x:30, y:50}, {x:180, y:50}, {x:330, y:50}, {x:470, y:50},
+  {x:30, y:230}, {x:180, y:230}, {x:330, y:230}, {x:470, y:230},
+  {x:30, y:400}, {x:180, y:400}, {x:330, y:400}, {x:470, y:400},
+];
+
+cards.forEach((card, index) => {
+    card.x = positions[index].x;
+    card.y = positions[index].y;
+});
+
+cards.forEach(card => card.onFlip = handleFlip)
+
+let flippedCards = [];
+
+function handleFlip(card) {
+
+    if(card.matched) return;
+
+    flippedCards.push(card);
+
+    if (flippedCards.length === 2) {
+        let [cardA, cardB] = flippedCards;
+
+        if (cardA !== cardB && cardA.color === cardB.color) {
+            cardA.matched = true;
+            cardB.matched = true;
+        } else {
+            setTimeout( () => {
+                cardA.isFaceUp = false;
+                cardB.isFaceUp = false;
+            }, 1000);
+
+        }
+    flippedCards = [];
+
+        }
+
+    }
+
 
 
 
@@ -46,6 +98,32 @@ function gameLoop() {
     card5b.draw();
     card6a.draw();
     card6b.draw();
+
+
+    pencil.clearRect(0, 0, canvas.width, canvas.height);
+    cards.forEach(card => card.draw());
+
+    if (cards.every(card => card.matched)) {
+    WinScreen();
+
+    }
+
+    function WinScreen() {
+        pencil.fillStyle = "rgba(255, 47, 47, 0.6)"
+        pencil.fillRect(0, 0, canvas.width, canvas.height);
+
+
+        pencil.fillStyle = "orange";
+        pencil.font = "60px Ariel";
+        pencil.textAlign = "center";
+        pencil.fillText("You're did it", canvas.width / 2, canvas.height / 2);
+
+
+
+
+
+
+    }
     
 }
 
